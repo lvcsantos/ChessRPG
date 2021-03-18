@@ -5,17 +5,19 @@ frame = 0
 
 
 class Piece:
-    def __init__(self, row, col, player, board_size, grid_size):
+    def __init__(self, row, col, player, board_len, grid_len, board_xy):
+        self.SIZE = int(board_len / 10)
+        self.Y_OFFSET = 6
+        self.TILE_SIZE = board_len / grid_len
+        self.GRID = grid_len
+        self.BOARD_X = board_xy[0]
+        self.BOARD_Y = board_xy[1]
         self.row = row
         self.col = col
         self.player = player
         self.speed = 0
         self.selected = False
         self.move_list = []
-        self.SIZE = int(board_size / 10)
-        self.y_offset = 6
-        self.TILE_SIZE = board_size / grid_size
-        self.GRID = grid_size
         self.sel_img = pygame.image.load(os.path.join('img', 'selected_aura.png'))
 
     def change_loc(self, new_row, new_col):
@@ -24,10 +26,10 @@ class Piece:
 
     def grid2pos(self, row, col, offset=True):
         if offset:
-            y = row * self.TILE_SIZE + self.y_offset
+            y = row * self.TILE_SIZE + self.Y_OFFSET + self.BOARD_Y
         else:
-            y = row * self.TILE_SIZE
-        x = col * self.TILE_SIZE
+            y = row * self.TILE_SIZE + self.BOARD_Y
+        x = col * self.TILE_SIZE + self.BOARD_X
         return x, y
 
     def is_move_valid(self, board, row, col):
@@ -98,13 +100,12 @@ class Piece:
 class Dragon(Piece):
     """
         Abilities
-        Fire Bolt: Range=5 | Damage=5 | CD=0 | Description=Hurl fire at one target to deal 5 damage
-        Fireball: Range=4 | Damage=4 | CD=0 | Description=Deals 4 damage per target in a 3x3 square
-        Blink: Range=5 | Damage=0 | CD=1 | Description=Can teleport five squares (doesn't count as move action)
+
     """
 
-    def __init__(self, row, col, player, board_size, grid_size):
-        super().__init__(row, col, player, board_size, grid_size)
+    def __init__(self, row, col, player, board_len, grid_len, board_xy):
+        super().__init__(row, col, player, board_len, grid_len, board_xy)
+        self.SIZE = int(self.TILE_SIZE * 2)
         self.y_offset = 4
         self.hp = 17
         self.speed = 4
@@ -117,20 +118,11 @@ class Dragon(Piece):
         if self.player == 'Player 1':
             self.color = 'red'
         elif self.player == 'Player 2':
-            self.color = 'blue'
+            self.color = 'gold'
         else:
-            self.color = 'green'
-        img = pygame.image.load(os.path.join('img', f'wizard_{self.color}.png'))
+            self.color = 'gold'
+        img = pygame.image.load(os.path.join('img', f'dragon_{self.color}.png'))
         self.img = pygame.transform.scale(img, (self.SIZE, self.SIZE))
-
-    def firebolt(self):
-        pass
-
-    def fireball(self):
-        pass
-
-    def blink(self):
-        pass
 
 
 class Wizard(Piece):
@@ -141,15 +133,17 @@ class Wizard(Piece):
         Blink: Range=5 | Damage=0 | CD=1 | Description=Can teleport five squares (doesn't count as move action)
     """
 
-    def __init__(self, row, col, player, board_size, grid_size):
-        super().__init__(row, col, player, board_size, grid_size)
+    def __init__(self, row, col, player, board_len, grid_len, board_xy):
+        super().__init__(row, col, player, board_len, grid_len, board_xy)
         self.y_offset = 4
         self.hp = 13
         self.speed = 1
         self.abilities = {'basic': 'Firebolt', 'special': 'Fireball', 'utility': 'Blink'}
         self.basic = {'name': 'Firebolt', 'damage': 5, 'range': 5, 'cd': 0, 'info': 'Hurl a bolt of fire at a foe'}
-        self.special = {'name': 'Fireball', 'damage': 3, 'range': 4, 'cd': 0, 'info': 'Hurl a bolt of fire at a foe'}
-        self.utility = {'name': 'Blink', 'damage': 0, 'range': 5, 'cd': 0, 'info': 'Hurl a bolt of fire at a foe'}
+        self.special = {'name': 'Fireball', 'damage': 3, 'range': 4, 'cd': 0, 'info': 'Conjure a ball of fire that '
+                                                                                      'explodes in a 3x3 area'}
+        self.utility = {'name': 'Blink', 'damage': 0, 'range': 5, 'cd': 0, 'info': 'Teleport to target location'}
+
         if self.player == 'Player 1':
             self.color = 'red'
         else:
@@ -157,13 +151,13 @@ class Wizard(Piece):
         img = pygame.image.load(os.path.join('img', f'wizard_{self.color}.png'))
         self.img = pygame.transform.scale(img, (self.SIZE, self.SIZE))
 
-    def firebolt(self):
+    def Firebolt(self):
         pass
 
-    def fireball(self):
+    def Fireball(self):
         pass
 
-    def blink(self):
+    def Blink(self):
         pass
 
 
@@ -175,8 +169,8 @@ class Rogue(Piece):
         Hide: Range=0 | Damage=0 | CD=1 | Description=Can't be targeted with damage abilities until next turn
     """
 
-    def __init__(self, row, col, player, board_size, grid_size):
-        super().__init__(row, col, player, board_size, grid_size)
+    def __init__(self, row, col, player, board_len, grid_len, board_xy):
+        super().__init__(row, col, player, board_len, grid_len, board_xy)
         self.hp = 16
         self.speed = 5
         self.abilities = ['Stab', 'Backstab', 'Hide']
@@ -200,8 +194,8 @@ class Cleric(Piece):
         Fear: Range=2 | Damage=0 | CD=0 | Description=Causes an enemy to run away 1-5 squares to a chosen location
     """
 
-    def __init__(self, row, col, player, board_size, grid_size):
-        super().__init__(row, col, player, board_size, grid_size)
+    def __init__(self, row, col, player, board_len, grid_len, board_xy):
+        super().__init__(row, col, player, board_len, grid_len, board_xy)
         self.y_offset = 10
         self.hp = 14
         self.speed = 2
@@ -224,8 +218,8 @@ class Paladin(Piece):
         Dispel: Range=2 | Damage=0 | CD=1 | Description=Choose one ability for the target to lose for 2 turns
     """
 
-    def __init__(self, row, col, player, board_size, grid_size):
-        super().__init__(row, col, player, board_size, grid_size)
+    def __init__(self, row, col, player, board_len, grid_len, board_xy):
+        super().__init__(row, col, player, board_len, grid_len, board_xy)
         self.y_offset = 10
         self.hp = 16
         self.speed = 3
@@ -249,8 +243,8 @@ class Ranger(Piece):
         Entangle: Range=4 | Damage=0 | CD=0 | Description=Causes a target to lose movement for 1 turn (prevents blink)
     """
 
-    def __init__(self, row, col, player, board_size, grid_size):
-        super().__init__(row, col, player, board_size, grid_size)
+    def __init__(self, row, col, player, board_len, grid_len, board_xy):
+        super().__init__(row, col, player, board_len, grid_len, board_xy)
         self.y_offset = 8
         self.hp = 16
         self.speed = 3

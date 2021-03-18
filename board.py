@@ -5,29 +5,32 @@ from piece import Paladin
 from piece import Ranger
 from piece import Rogue
 from piece import Wizard
+from piece import Dragon
 
 
 class Board:
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, board_len):
         self.GRID = 9
-        self.WIDTH, self.HEIGHT = width, height
+        self.WIDTH = self.HEIGHT = board_len
         self.x, self.y = x, y
         self.board_img = pygame.transform.scale(pygame.image.load(os.path.join("img", "dark_grid_9x9.png")),
                                                 (self.WIDTH, self.HEIGHT))
 
         self.board = [[0 for x in range(self.GRID)] for _ in range(self.GRID)]
 
-        self.board[0][2] = Paladin(0, 2, 'Player 1', self.WIDTH, self.GRID)
-        self.board[0][3] = Cleric(0, 3, 'Player 1', self.WIDTH, self.GRID)
-        self.board[0][4] = Wizard(0, 4, 'Player 1', self.WIDTH, self.GRID)
-        self.board[0][5] = Rogue(0, 5, 'Player 1', self.WIDTH, self.GRID)
-        self.board[0][6] = Ranger(0, 6, 'Player 1', self.WIDTH, self.GRID)
+        self.board[0][2] = Paladin(0, 2, 'Player 1', board_len, self.GRID, [x, y])
+        self.board[0][3] = Cleric(0, 3, 'Player 1', board_len, self.GRID, [x, y])
+        self.board[0][4] = Wizard(0, 4, 'Player 1', board_len, self.GRID, [x, y])
+        self.board[0][5] = Rogue(0, 5, 'Player 1', board_len, self.GRID, [x, y])
+        self.board[0][6] = Ranger(0, 6, 'Player 1', board_len, self.GRID, [x, y])
 
-        self.board[8][2] = Paladin(8, 2, 'Player 2', self.WIDTH, self.GRID)
-        self.board[8][3] = Cleric(8, 3, 'Player 2', self.WIDTH, self.GRID)
-        self.board[8][4] = Wizard(8, 4, 'Player 2', self.WIDTH, self.GRID)
-        self.board[8][5] = Rogue(8, 5, 'Player 2', self.WIDTH, self.GRID)
-        self.board[8][6] = Ranger(8, 6, 'Player 2', self.WIDTH, self.GRID)
+        self.board[8][2] = Paladin(8, 2, 'Player 2', board_len, self.GRID, [x, y])
+        self.board[8][3] = Cleric(8, 3, 'Player 2', board_len, self.GRID, [x, y])
+        self.board[8][4] = Wizard(8, 4, 'Player 2', board_len, self.GRID, [x, y])
+        self.board[8][5] = Rogue(8, 5, 'Player 2', board_len, self.GRID, [x, y])
+        self.board[8][6] = Ranger(8, 6, 'Player 2', board_len, self.GRID, [x, y])
+
+        # self.board[4][4] = Dragon(4, 4, 'Wild', board_len, self.GRID, [x, y])
 
         self.pieceSelected = False
         self.winner = None
